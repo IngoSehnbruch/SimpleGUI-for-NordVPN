@@ -1,0 +1,67 @@
+# This python script uses the following encoding: utf8
+import subprocess
+import os
+import socket
+import json
+
+
+#* get (current) local ip
+def localip():
+    return [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1] # filter 127.0.0.1
+
+
+#run a consolecommand and return output as line (and optional generate a dict by given var-names)
+def runCommand(cmd, varList=[], lines_ignored=[], donotskip = False):
+    try:
+        result = subprocess.run(cmd, stdout=subprocess.PIPE)
+    
+        textlines = [ ]
+        varDict = { }
+        for line in result.stdout.decode('utf-8').splitlines():
+            # Filter Out "loadingwheel"
+            if len(line)>3:
+                # Add to var Dict or textlines
+                if line.split(': ')[0] in varList:
+                    varDict[line.split(': ')[0]] = line.split(': ')[1]
+                else:
+                    skip = False
+                    for l in lines_ignored:
+                        if l in line: skip = True
+                    if not skip or donotskip: textlines.append(line)
+
+    except Exception as err:
+        #print("ERROR:", err)
+        if varList != []:
+            return False, False
+        else:
+            return False
+    
+    if varList != []:
+        return textlines, varDict
+    else:
+        return textlines
+
+
+
+# load a json-textfile as a dict
+def loadJsonFile(jsonFilename):
+    jsonDataDict = None
+    if os.path.exists(jsonFilename):
+        with open(jsonFilename) as jsonfile:
+            try:
+                jsonDataDict = json.load( jsonfile )
+            except Exception as err:
+                print('ERROR LOADING FILE', jsonFilename, " >>> ", err)
+    
+    return jsonDataDict
+
+    
+# save a dict as a json-textfile
+def saveJsonFile(jsonFilename, jsonDataDict):
+    try:
+        with open(jsonFilename, 'w') as jsonfile:
+            json.dump(jsonDataDict, jsonfile, indent = 2)
+        return True
+    except Exception as err:
+        print('ERROR SAVING FILE', jsonFilename, " >>> ", err)
+        return False
