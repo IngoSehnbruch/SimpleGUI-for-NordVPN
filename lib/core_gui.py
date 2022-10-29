@@ -55,6 +55,28 @@ def log(title, text="", error=False):
 
 #* ---------- GUI STUFF ----------
 
+def getWindowPosition():
+    #global window
+    pos = None
+    try:
+        if window:
+            pos = window.CurrentLocation()
+    except:
+        pass
+    
+    if not pos:
+        if var.SETTINGS['remember_position']:
+            pos = var.SETTINGS['window_position']
+        else:
+            pos = var.defaultwindowposition
+
+    return pos
+
+
+    print('POS', pos)
+    return pos
+
+
 def processWindow(wintitle="Processing...", wintext=['Process is running. Please wait.',]):
     layout = []
     for text in wintext:
@@ -62,7 +84,7 @@ def processWindow(wintitle="Processing...", wintext=['Process is running. Please
 
     layout.append([sg.Text('')])
         
-    return sg.Window(wintitle, layout, keep_on_top=True)
+    return sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     
 
 
@@ -74,9 +96,11 @@ def showInfo(wintitle="Info", wintext=['Information',]):
     layout.append([sg.Text('')])
     layout.append([sg.OK(button_text='OK', size=(22, 1))])
     
-    infowindow = sg.Window(wintitle, layout, keep_on_top=True)
+    window.Hide()
+    infowindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     event, values = infowindow.read()
     infowindow.close()
+    window.UnHide()
 
     if event == 'OK':
         return True
@@ -91,9 +115,11 @@ def getConfirmation(wintitle="Confirm", wintext=['Please confirm',]):
     layout.append([sg.Text('')])
     layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
     
-    confirmationwindow = sg.Window(wintitle, layout, keep_on_top=True)
+    window.Hide()
+    confirmationwindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     event, values = confirmationwindow.read()
     confirmationwindow.close()
+    window.UnHide()
 
     if event == 'OK':
         return True
@@ -107,9 +133,11 @@ def getMultipleChoice(wintitle="Please choose", wintext="Min 1 choice:", valueli
     layout.append([sg.Text('')])
     layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
     
-    choicewindow = sg.Window(wintitle, layout, keep_on_top=True)
+    window.Hide()
+    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     event, choices = choicewindow.read()
     choicewindow.close()
+    window.UnHide()
 
     if event == 'OK':
         if choices:
@@ -139,9 +167,11 @@ def getSingleChoice(wintitle="Please choose", wintext="1 choice:", valuelist= ['
     layout.append([sg.Text('')])
     layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
     
-    choicewindow = sg.Window(wintitle, layout, keep_on_top=True)
+    window.Hide()
+    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     event, choices = choicewindow.read()
     choicewindow.close()
+    window.UnHide()
 
     if event == 'OK':
         newlist = []
@@ -172,9 +202,11 @@ def getSingleChoice_Dropdown(wintitle="Please choose", wintext="1 choice:", valu
     layout.append([sg.Text('')])
     layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
     
-    choicewindow = sg.Window(wintitle, layout, keep_on_top=True)
+    window.Hide()
+    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     event, values = choicewindow.read()
     choicewindow.close()
+    window.UnHide()
 
     if event == 'OK':
         newlist = []
@@ -192,9 +224,12 @@ def getFile(wintitle="File", wintext="Choose a file", filetypes=("all", "*.*")):
                 [sg.Input(size=(40,1), visible=True), sg.FileBrowse(button_text='FILES', size=(10, 1), file_types=(filetypes,))],
                 [sg.Text('')],
                 [sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))] ]
-    filewindow = sg.Window(wintitle, layout, keep_on_top=True)
+    
+    window.Hide()
+    filewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     event, files = filewindow.read()
     filewindow.close()
+    window.UnHide()
 
     if event == 'OK':
         if files[0]:
@@ -210,9 +245,13 @@ def getValue(wintitle="Value", wintext="Please ender value", defaulttext=''):
                 [sg.Input(size=(40,1), default_text = defaulttext)],
                 [sg.Text('')],
                 [sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))] ]
-    valuewindow = sg.Window(wintitle, layout, keep_on_top=True)
+    
+    window.Hide()
+    valuewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
     event, values = valuewindow.read()
+    
     valuewindow.close()
+    window.UnHide()
 
     if event == 'OK':
         if values[0]:
@@ -265,6 +304,7 @@ def updateStatus():
 
 def select_server(selection=None, country=None):
     global vpnSettings
+    window.Hide()
 
     reply = None
 
@@ -289,6 +329,7 @@ def select_server(selection=None, country=None):
     
     if reply: log(reply[0])
     
+    window.UnHide()
     updateStatus()
 
 
@@ -314,7 +355,7 @@ def settings_gui():
         ],   
     ]
 
-    window_settings = sg.Window(settingswindowtitle, layout_settings, location=window.CurrentLocation(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
+    window_settings = sg.Window(settingswindowtitle, layout_settings, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
     window_settings.BringToFront()
     window.Hide()
     while True:  # Event Loop
@@ -336,7 +377,7 @@ def settings_gui():
                     var.SETTINGS[setting] = values[setting]
 
                 if var.SETTINGS['remember_position']:
-                    var.SETTINGS['window_position'] = window.CurrentLocation()
+                    var.SETTINGS['window_position'] = window.CurrentPosition()
                 else:
                     var.SETTINGS['window_position'] = False
                 
@@ -376,8 +417,9 @@ def settings_vpn():
         ],   
     ]
 
-    window_settings = sg.Window(settingswindowtitle, layout_settings, location=window.CurrentLocation(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
+    window_settings = sg.Window(settingswindowtitle, layout_settings, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
     window_settings.BringToFront()
+    window.Hide()
 
     while True:  # Event Loop
         event, values = window_settings.read(timeout=0)
@@ -389,6 +431,7 @@ def settings_vpn():
                 #basics.bot2api("info", "OFFLINE")
                 #print('SETTINGS WINDOW POSITION:', window_settings.CurrentLocation())
                 window_settings.close()
+                window.UnHide()
                 break
             elif event == 'SAVE':
                 #print(event, values)
@@ -413,6 +456,7 @@ def settings_vpn():
                             changelog = changelog + reply
 
                 window_settings.close()
+                window.UnHide()
 
                 if changes == 0:
                     showInfo(wintitle="Nothing changed", wintext=['No settings changed.',])
@@ -432,6 +476,13 @@ def mainwindow():
     global vpnSettings
     global vpnStatus
 
+    if window:
+        try:
+            window.Close()
+        except:
+            pass
+        window = None
+
     windowtitle = 'SimpleGUI for NordVPN'
     areaVisibility = { 'Status' : True, 'Quickset' : True }
 
@@ -443,15 +494,16 @@ def mainwindow():
         [ sg.Text() ],
     ]
 
-    if not var.SETTINGS['window_position']:
-        window = sg.Window('Loading ...', layout, element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
-    else:
-        window = sg.Window('Loading ...', layout, location=var.SETTINGS['window_position'], element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
+    #if not var.SETTINGS['window_position']:
+    #    window = sg.Window('Loading ...', layout, element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
+    #else:
+    window = sg.Window('Loading ...', layout, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
 
     window.Refresh()
     vpnSettings = vpnControl.vpnLoadSettings()
     vpnStatus = vpnControl.vpnStatus()[1] # ignore text, only grab vars
     window.close()
+    window = None
     
     #! needs a nice window...
     #if vpnSettings.get('infos'):
@@ -536,10 +588,10 @@ def mainwindow():
         
 
     # create window
-    if not var.SETTINGS['window_position']:
-        window = sg.Window(windowtitle, layout, element_justification='center', alpha_channel = 1, keep_on_top=var.SETTINGS['keep_on_top'], right_click_menu=MENU_RIGHT_CLICK, finalize=True) #.centered
-    else:
-        window = sg.Window('SimpleGUI for NordVPN', layout, location=var.SETTINGS['window_position'], element_justification='center', alpha_channel = 1, keep_on_top=var.SETTINGS['keep_on_top'], right_click_menu=MENU_RIGHT_CLICK, finalize=True) #.use var.window_positionfixed
+    #if not var.SETTINGS['window_position']:
+    #    window = sg.Window(windowtitle, layout, element_justification='center', alpha_channel = 1, keep_on_top=var.SETTINGS['keep_on_top'], right_click_menu=MENU_RIGHT_CLICK, finalize=True) #.centered
+    #else:
+    window = sg.Window('SimpleGUI for NordVPN', layout, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=var.SETTINGS['keep_on_top'], right_click_menu=MENU_RIGHT_CLICK, finalize=True) #.use var.window_positionfixed
     window.Refresh()
 
     status_ts = updateStatus()
@@ -568,9 +620,12 @@ def mainwindow():
             #! SAVE LAST WINDOW POSITION!
             
             if event == sg.WIN_CLOSED or event == 'EXIT' or event == 'Exit':
+                window.Close()
                 return True
 
             elif event == 'Restart':
+                window.Close()
+                window = None
                 return False
 
             elif event == '-btnConnect-':

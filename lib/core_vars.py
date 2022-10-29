@@ -19,6 +19,8 @@ splash = os.path.join(mediafolder, 'logo_nordvpn.png')
 
 settings_jsonfile = os.path.join(appfolder, 'settings.json')
 
+defaultwindowposition = (50, 50)
+
 SETTINGS = {
     'DEBUG' : True, # get a boolean value
     'console' : True,
