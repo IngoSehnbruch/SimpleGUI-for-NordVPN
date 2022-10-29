@@ -17,8 +17,20 @@ lines_ignored   = ['A new version', 'New feature']
 # Cache-Duration for vpn-details: available Countries, Cities and Groups. 0 for never use cache. Runs on Startup.
 maxDaysCached   = 2 
 
-def vpnConnect():
-    return runCommand( [vpnapp, 'connect'], lines_ignored=lines_ignored )
+def vpnConnect(server=None):
+    # update "last connection"-info for quickconnec
+    if not server and var.SETTINGS['lastconnection'] is not None: server = var.SETTINGS['lastconnection']
+
+    if var.SETTINGS['lastconnection'] != server:
+        var.SETTINGS['lastconnection'] = server # None = Automatic
+        var.saveSettings()
+
+    if not server or server == 'Automatic':
+        reply = runCommand( [vpnapp, 'connect'], lines_ignored=lines_ignored )
+    else:
+        reply = runCommand( [vpnapp, 'connect', server], lines_ignored=lines_ignored )
+
+    return reply
 
 def vpnDisconnect():
     return runCommand( [vpnapp, 'disconnect'], lines_ignored=lines_ignored )
@@ -30,7 +42,7 @@ def vpnSet(setvar, setvarto):
     return runCommand( [vpnapp, 'set', setvar, setvarto] , varList=status_vars, lines_ignored=lines_ignored )
 
 def vpnLoadSettings():
-    jsonVpnFile = os.path.join( var.datafolder, 'options_nordvpn.json')
+    jsonVpnFile = os.path.join( var.appfolder, 'options_nordvpn.json')
 
     # GET NORD-VPN APP-VERSION (step by step - may not be installed!)
     vpnversion = "NOT INSTALLED"

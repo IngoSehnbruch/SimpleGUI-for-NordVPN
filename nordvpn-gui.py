@@ -11,7 +11,7 @@ def checkpath(pathname):
     try:
         if not os.path.isdir(pathname):
             os.makedirs(pathname)
-            #print('Path created: ' + pathname)
+            print('Path created: ' + pathname)
         return True
     except Exception as err:
         print("ERROR: PATH CAN NOT BE CREATED")
@@ -24,21 +24,20 @@ def checkpath(pathname):
 if __name__ == '__main__':
 
     if not checkpath(var.logfolder): quit()
-    if not checkpath(var.datafolder): quit()
+#    if not checkpath(var.datafolder): quit()
 
     autostart = False
     console = True
     logdetailed = False
     
-    optionals = ['-autostart', '-terminal', '-logdetailed']
+    optionals = ['-terminal', '-log']
     for arg in sys.argv[1:]:
-        if arg=="-autostart":       var.SETTINGS['autostart']   = True
-        elif arg=="-terminal":      var.SETTINGS['console']     = False
-        elif arg=="-logdetailed":   var.SETTINGS['logdetailed'] = True
+        if arg=="-terminal":    var.SETTINGS['console']     = False
+        elif arg=="-log":       var.SETTINGS['log'] = True
         else: print("UNKNOWN ARGUMENT:", arg)
 
-    #* Override autoconnect if autostart is true:
-    if var.SETTINGS['autostart']: var.SETTINGS['autoconnect'] = True
-
     #* load GUI to continue
-    gui.mainwindow()
+    end = False
+    while not end:        
+        end = gui.mainwindow()
+

@@ -1,23 +1,48 @@
 # This python script uses the following encoding: utf8
 import os
 import sys
+import json
 
 #* app defaults
 appversion = "0.1"
-icon = "pynordvpn.ico"
+icon = "nordvpngui.ico"
 separator = ";"
+
+
+#* folders
+appfolder = os.path.dirname(sys.argv[0])
+logfolder = os.path.join(appfolder, 'logs')
+#datafolder = os.path.join(appfolder, 'data')
+
+mediafolder = os.path.join(appfolder, 'media')
+splash = os.path.join(mediafolder, 'logo_nordvpn.png')
+
+settings_jsonfile = os.path.join(appfolder, 'settings.json')
 
 SETTINGS = {
     'DEBUG' : True, # get a boolean value
-    'autostart': False,
-    'autoconnect': False,
     'console' : True,
-    'logdetailed' : False,
+    'log' : False,
     'keep_on_top' : True,
-    'window_positionfixed' : False, # e.g. (750, 220) or false
+    'remember_position' : False,
+    'window_position' : False, # e.g. (750, 220) or false
+    'lastconnection' : 'Automatic', # None = automatic
 }
 
+if os.path.exists(settings_jsonfile):
+    with open(settings_jsonfile, 'r') as f:
+        SETTINGS.update(json.load(f))
+
+
+def saveSettings():
+    with open(settings_jsonfile, 'w') as f:
+        json.dump(SETTINGS, f, indent=4)
+
+
 LINKS = {
+    'gui' : { 
+        'github' : 'https://github.com/IngoSehnbruch/SimpleGUI-for-NordVPN',
+    },
     'nordvpn' : { 
         'install' : 'https://nordvpn.com/de/download/linux/',
     },
@@ -37,11 +62,3 @@ settingsDict = {
 }
     # defaults => Restores settings to their default values.
 
-
-#* folders
-appfolder = os.path.dirname(sys.argv[0])
-logfolder = os.path.join(appfolder, 'logs')
-datafolder = os.path.join(appfolder, 'data')
-
-mediafolder = os.path.join(appfolder, 'media')
-splash = os.path.join(mediafolder, 'logo_nordvpn.png')
