@@ -8,6 +8,7 @@ appversion = "0.1"
 icon = "nordvpngui.ico"
 separator = ";"
 
+minclientversion = "3.13.2"
 
 #* folders
 appfolder = os.path.dirname(sys.argv[0])
@@ -16,10 +17,18 @@ logfolder = os.path.join(appfolder, 'logs')
 
 mediafolder = os.path.join(appfolder, 'media')
 splash = os.path.join(mediafolder, 'logo_nordvpn.png')
+statusicon = {
+        'green' : os.path.join(mediafolder, 'status_green_100.png'),
+        'red' : os.path.join(mediafolder, 'status_red_100.png'),
+        'grey' : os.path.join(mediafolder, 'status_grey_100.png'),
+    }
 
 settings_jsonfile = os.path.join(appfolder, 'settings.json')
 
 defaultwindowposition = (50, 50)
+font = ('Segoe UI', 12)
+
+
 
 SETTINGS = {
     'DEBUG' : True, # get a boolean value
@@ -29,6 +38,7 @@ SETTINGS = {
     'remember_position' : False,
     'window_position' : False, # e.g. (750, 220) or false
     'lastconnection' : 'Automatic', # None = automatic
+    'darkmode' : False,
 }
 
 if os.path.exists(settings_jsonfile):
@@ -41,12 +51,49 @@ def saveSettings():
         json.dump(SETTINGS, f, indent=4)
 
 
+
+#! CI COLORS from NordVPN-brandbook
+
+colors = {
+    'blue' :        '#4687ff',
+    'dark_blue' :   '#0e1b33',
+    'red' :         "#F64F64",
+    'orange' :      '#FF7E23',
+    'purple' :      '#7F7AEE',
+    'green' :       '#27BE56',
+    'black' :       '#000000',
+    'white' :       '#ffffff',
+}
+
+if SETTINGS['darkmode']:
+    splashbgcolor = colors['dark_blue']
+    splastextcolor = colors['white']
+
+    windowbgcolor = colors['dark_blue']
+    buttonbgcolors = (colors['white'], colors['blue'])
+    connectbgcolor = colors['purple']
+    textcolor = colors['white']
+else:
+    splashbgcolor = colors['dark_blue']
+    splastextcolor = colors['white']
+    
+    windowbgcolor = colors['white']
+    buttonbgcolors = (colors['white'], colors['blue'])
+    connectbgcolor = colors['purple']
+    textcolor = colors['dark_blue']
+
+
+
+
 LINKS = {
     'gui' : { 
-        'github' : 'https://github.com/IngoSehnbruch/SimpleGUI-for-NordVPN',
+        'homepage'  : 'https://github.com/IngoSehnbruch/SimpleGUI-for-NordVPN',
+        'github'    : 'https://github.com/IngoSehnbruch/SimpleGUI-for-NordVPN',
     },
     'nordvpn' : { 
-        'install' : 'https://nordvpn.com/de/download/linux/',
+        'homepage'  : 'https://nordvpn.com/',
+        'install'   : 'https://nordvpn.com/de/download/linux/',
+        'register'  : 'https://nordvpn.com/pricing/'
     },
 }
 

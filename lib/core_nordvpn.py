@@ -41,6 +41,19 @@ def vpnStatus():
 def vpnSet(setvar, setvarto):
     return runCommand( [vpnapp, 'set', setvar, setvarto] , varList=status_vars, lines_ignored=lines_ignored )
 
+def vpnLogin():
+    return runCommand( [vpnapp, 'login'] , varList=status_vars, lines_ignored=lines_ignored )
+
+def vpnLogout():
+    return runCommand( [vpnapp, 'logout'] , varList=status_vars, lines_ignored=lines_ignored )
+
+def vpnRegister():
+    return runCommand( [vpnapp, 'register'] , varList=status_vars, lines_ignored=lines_ignored )
+
+
+def vpnLoadAccount():
+    return runCommand( [vpnapp, 'account'], ['Email Address', 'VPN Service'], lines_ignored=lines_ignored )[1]
+
 def vpnLoadSettings():
     jsonVpnFile = os.path.join( var.appfolder, 'options_nordvpn.json')
 
@@ -109,7 +122,7 @@ def vpnLoadSettings():
     infos, settings = runCommand( [vpnapp, 'settings'], varList=settings_vars )
 
     # GET ACCOUNT INFOS
-    account = runCommand([vpnapp, 'account'], ['Email Address', 'VPN Service'], lines_ignored=lines_ignored)[1]
+    account = vpnLoadAccount()
 
     return {'vpnversion' : vpnversion, 'infos' : infos, 'countries' : countries, 'citydict': citydict, 'vpngroups' : vpngroups, 'settings' : settings, 'account' : account}
     

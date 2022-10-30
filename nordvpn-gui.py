@@ -24,11 +24,6 @@ def checkpath(pathname):
 if __name__ == '__main__':
 
     if not checkpath(var.logfolder): quit()
-#    if not checkpath(var.datafolder): quit()
-
-    autostart = False
-    console = True
-    logdetailed = False
     
     optionals = ['-terminal', '-log']
     for arg in sys.argv[1:]:
@@ -36,8 +31,10 @@ if __name__ == '__main__':
         elif arg=="-log":       var.SETTINGS['log'] = True
         else: print("UNKNOWN ARGUMENT:", arg)
 
+    
+
     #* load GUI to continue
     end = False
-    while not end:        
+    while not end:
         end = gui.mainwindow()
 

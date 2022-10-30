@@ -1,8 +1,10 @@
 # This python script uses the following encoding: utf8
 import os
+import sys
 import PySimpleGUI as sg
 
 import json
+import webbrowser
 
 from datetime import datetime
 from time import sleep
@@ -17,8 +19,24 @@ vpnStatus = None
 
 #* ---------- GUI STYLE ----------
 
-sg.theme('DarkBlue1')  # please make your windows colorful : ) #DarkGrey14
-sg.set_options(icon = var.icon, font=('Segoe UI', 12) )
+# sg.theme('DarkBlue1')  # please make your windows colorful : ) #DarkGrey14
+
+sg.set_options(
+        icon                            = var.icon, 
+        font                            = var.font, 
+
+        button_color                    = var.buttonbgcolors,
+        input_text_color                = var.textcolor,
+        scrollbar_color                 = var.textcolor,
+        text_color                      = var.textcolor,
+        element_text_color              = var.textcolor,
+
+        background_color                = var.windowbgcolor, 
+        element_background_color        = var.windowbgcolor, 
+        text_element_background_color   = var.windowbgcolor,
+        input_elements_background_color = var.windowbgcolor,
+        
+    )
 
 #* ---------- LOGGING ----------
 
@@ -38,7 +56,7 @@ def log(title, text="", error=False):
 
     #* write to file:
     if var.SETTINGS['log']:
-        with open(os.path.join(var.logfolder, "log_processing.txt"), "a") as logfile:
+        with open(os.path.join(var.logfolder, str(datetime.now().strftime('%Y%m%d')) + "_log.txt"), "a") as logfile:
             logfile.write(logstr + "\n")
         #* simple error-logs:
         if error:
@@ -94,13 +112,14 @@ def showInfo(wintitle="Info", wintext=['Information',]):
         layout.append([sg.Text(text)])
 
     layout.append([sg.Text('')])
-    layout.append([sg.OK(button_text='OK', size=(22, 1))])
+    layout.append([sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1))])
     
     window.Hide()
-    infowindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
+    infowindow = sg.Window(wintitle, layout, location=getWindowPosition(), element_justification='center', keep_on_top=True)
     event, values = infowindow.read()
     infowindow.close()
     window.UnHide()
+    window.Refresh()
 
     if event == 'OK':
         return True
@@ -113,13 +132,14 @@ def getConfirmation(wintitle="Confirm", wintext=['Please confirm',]):
         layout.append([sg.Text(text)])
 
     layout.append([sg.Text('')])
-    layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
+    layout.append([sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))])
     
     window.Hide()
-    confirmationwindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
+    confirmationwindow = sg.Window(wintitle, layout, location=getWindowPosition(), element_justification='center', keep_on_top=True)
     event, values = confirmationwindow.read()
     confirmationwindow.close()
     window.UnHide()
+    window.Refresh()
 
     if event == 'OK':
         return True
@@ -128,16 +148,18 @@ def getConfirmation(wintitle="Confirm", wintext=['Please confirm',]):
 
 def getMultipleChoice(wintitle="Please choose", wintext="Min 1 choice:", valuelist= ['none',], selectall=False):
     layout = [[sg.Text(wintext + ':')],]
+    layout.append([sg.Text('')])
     for vitem in valuelist:
         layout.append([sg.Checkbox(vitem, default=selectall)])
     layout.append([sg.Text('')])
-    layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
+    layout.append([sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))])
     
     window.Hide()
-    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
+    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), element_justification='left', keep_on_top=True)
     event, choices = choicewindow.read()
     choicewindow.close()
     window.UnHide()
+    window.Refresh()
 
     if event == 'OK':
         if choices:
@@ -156,6 +178,7 @@ def getMultipleChoice(wintitle="Please choose", wintext="Min 1 choice:", valueli
 
 def getSingleChoice(wintitle="Please choose", wintext="1 choice:", valuelist= ['none',], selectfirst=False):
     layout = [[sg.Text(wintext)],]
+    layout.append([sg.Text('')])
     i=0
     for vitem in valuelist:
         i+=1
@@ -165,13 +188,14 @@ def getSingleChoice(wintitle="Please choose", wintext="1 choice:", valuelist= ['
             layout.append([sg.Radio(vitem, 0)])
 
     layout.append([sg.Text('')])
-    layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
+    layout.append([sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))])
     
     window.Hide()
-    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
+    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), element_justification='left', keep_on_top=True)
     event, choices = choicewindow.read()
     choicewindow.close()
     window.UnHide()
+    window.Refresh()
 
     if event == 'OK':
         newlist = []
@@ -200,13 +224,14 @@ def getSingleChoice_Dropdown(wintitle="Please choose", wintext="1 choice:", valu
     layout.append([ sg.InputCombo(( valuelist ), font=('Courier New', 12), key='-choice-'),                ])
 
     layout.append([sg.Text('')])
-    layout.append([sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))])
+    layout.append([sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))])
     
     window.Hide()
-    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
+    choicewindow = sg.Window(wintitle, layout, location=getWindowPosition(), element_justification='center', keep_on_top=True)
     event, values = choicewindow.read()
     choicewindow.close()
     window.UnHide()
+    window.Refresh()
 
     if event == 'OK':
         newlist = []
@@ -223,13 +248,14 @@ def getFile(wintitle="File", wintext="Choose a file", filetypes=("all", "*.*")):
     layout = [[sg.Text(wintext + ':')],
                 [sg.Input(size=(40,1), visible=True), sg.FileBrowse(button_text='FILES', size=(10, 1), file_types=(filetypes,))],
                 [sg.Text('')],
-                [sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))] ]
+                [sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))] ]
     
     window.Hide()
-    filewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
+    filewindow = sg.Window(wintitle, layout, location=getWindowPosition(), element_justification='center', keep_on_top=True)
     event, files = filewindow.read()
     filewindow.close()
     window.UnHide()
+    window.Refresh()
 
     if event == 'OK':
         if files[0]:
@@ -244,14 +270,15 @@ def getValue(wintitle="Value", wintext="Please ender value", defaulttext=''):
     layout = [[sg.Text(wintext + ':')],
                 [sg.Input(size=(40,1), default_text = defaulttext)],
                 [sg.Text('')],
-                [sg.OK(button_text='OK', size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', 'darkred'), size=(23, 1))] ]
+                [sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))] ]
     
     window.Hide()
-    valuewindow = sg.Window(wintitle, layout, location=getWindowPosition(), keep_on_top=True)
+    valuewindow = sg.Window(wintitle, layout, location=getWindowPosition(), element_justification='center', keep_on_top=True)
     event, values = valuewindow.read()
     
     valuewindow.close()
     window.UnHide()
+    window.Refresh()
 
     if event == 'OK':
         if values[0]:
@@ -265,10 +292,40 @@ def getValue(wintitle="Value", wintext="Please ender value", defaulttext=''):
 
 #* -------------------------------------------------------------------
 
+def checkAccountStatus():
+    account = vpnControl.vpnLoadAccount()
+    while not account.get('Email Address'):
+        # ask to login
+        todo = getSingleChoice(wintitle="Please login to NordVPN", wintext="You are not logged in. Please login to your NordVPN Account.", valuelist=['Login at NordVPN Website', 'Register at NordVPN Website', 'Exit NordVPN-GUI'], selectfirst=True)
+        if todo == 'Login at NordVPN Website':
+            reply = vpnControl.vpnLogin()
+            try:
+                url = (reply[0][0]).split(": ")[1]
+                webbrowser.open(url, new=2)
+                showInfo("Confirm when logged in", ['Your Browser has opened the NordVPN Loginpage.', 'Please confirm once you are logged in.'])
+                account = vpnControl.vpnLoadAccount() # if successful while ends
+            except Exception as err:
+                print(reply, err)
+                break
+        elif todo=="Register at NordVPN Website":
+            url = var.LINKS['nordvpn']['register']
+            webbrowser.open(url, new=2)
+            showInfo("Confirm when registered", ['Your Browser has opened the NordVPN Homepage.', 'Please confirm once you are logged in.'])
+            account = vpnControl.vpnLoadAccount() # if successful while ends
+            if not account.get('Email Address'):
+                showInfo("Confirm when logged in", ['Your Browser has opened the NordVPN Loginpage.', 'Please confirm once you are logged in.'])
+                account = vpnControl.vpnLoadAccount() # if successful while ends
+        else:
+            quit()
+    return True
+
+
 def updateStatus():
     global vpnStatus
     status = None
-    skipGuiUpdate = [ 'Status', ]
+
+    #* GET VPN Status
+
     try:
         vpnStatus = vpnControl.vpnStatus()[1] # ignore text, only grab vars
         status = vpnStatus['Status']
@@ -277,26 +334,35 @@ def updateStatus():
 
     if status == "Connected":
 
-        window['-btnConnect-'].update('DISCONNECT', button_color = ('white','darkgreen'))
+        window['-btnConnect-'].update('DISCONNECT')
+        window['-statusicon-'].update(filename=var.statusicon['green'])
+
         window['-status-Country-'].update(vpnStatus['Country'])
         window['-status-Server IP-'].update(vpnStatus['Server IP'])
         window['-status-Current technology-'].update(vpnStatus['Current technology'])
         window['-status-Current protocol-'].update(vpnStatus['Current protocol'])
         
-
-        if 'minutes' in vpnStatus['Uptime']:
-            vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minutes')[0] + "mins"
-        elif 'minute' in vpnStatus['Uptime']:
-            vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minute')[0] + "min"
-        
+        # Beautify utime-info
+        if "second" in vpnStatus['Uptime'].split(' ')[1]:
+            vpnStatus['Uptime'] = "Leass than a minute."
+        else:
+            if 'minutes' in vpnStatus['Uptime']:
+                vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minutes')[0] + "mins"
+            elif 'minute' in vpnStatus['Uptime']:
+                vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minute')[0] + "min"        
         window['-status-Uptime-'].update(vpnStatus['Uptime'])
+
     else:
-        window['-btnConnect-'].update('CONNECT', button_color = ('white','darkred'))
+        window['-btnConnect-'].update('CONNECT')
+        window['-statusicon-'].update(filename=var.statusicon['red'])
+        
         window['-status-Country-'].update('NOT CONNECTED')
         window['-status-Server IP-'].update('NOT CONNECTED')
         window['-status-Current technology-'].update('NOT CONNECTED')
         window['-status-Current protocol-'].update('NOT CONNECTED')
         window['-status-Uptime-'].update('NOT CONNECTED')
+
+    #print(vpnStatus)
 
     window.Refresh()
     return datetime.now()
@@ -304,10 +370,13 @@ def updateStatus():
 
 def select_server(selection=None, country=None):
     global vpnSettings
-    window.Hide()
+    #window.Hide()
 
     reply = None
 
+    window['-btnConnect-'].update('LOADING...')
+    window['-statusicon-'].update(filename=var.statusicon['grey'])
+    
     selections = ['Automatic', 'by Country', 'by City', 'by Type']
     if selection == None:
         selection = getSingleChoice(wintitle="Select Server", wintext="Select from what list to choose:", valuelist=selections, selectfirst=True)
@@ -328,22 +397,21 @@ def select_server(selection=None, country=None):
         if servertype: reply = vpnControl.vpnConnect(servertype)
     
     if reply: log(reply[0])
+
+    #window.UnHide()
     
-    window.UnHide()
     updateStatus()
 
 
 def settings_gui():
-    
-    # theme_name_list = sg.theme_list()
-
     settingswindowtitle = 'GUI Settings'
 
     layout_cb_gui = [
                     [ sg.Checkbox('Keep Window on Top', default = var.SETTINGS['keep_on_top'], key='keep_on_top', enable_events=True, tooltip=' Allways show GUI on top of all windows '), ],
+                    [ sg.Checkbox('Dark Mode', default = var.SETTINGS['darkmode'], key='darkmode', enable_events=True, tooltip=' Use dark colors '), ],
                     [ sg.Checkbox('Remember Windowposition', default = var.SETTINGS['remember_position'], key='remember_position', enable_events=True, tooltip=' Remember the Windowposition after restart'), ],
-                    [ sg.Checkbox('Log to file', default = var.SETTINGS['log'], key='log', enable_events=True, tooltip=' Log to file '), ],
                     [ sg.Checkbox('Show console', default = var.SETTINGS['console'], key='console', enable_events=True, tooltip=' If false log-output will be send to terminal '), ],
+                    [ sg.Checkbox('Log to file', default = var.SETTINGS['log'], key='log', enable_events=True, tooltip=' Log to file '), ],
                 ]
 
     layout_settings = [
@@ -351,7 +419,7 @@ def settings_gui():
         [ sg.Text('', font=('Segoe UI', 2) ) ],
         [   
             sg.Button('SAVE', size=(12,1), button_color=('white', 'darkgreen')),
-            sg.Button('CANCEL', size=(12,1), button_color=('white', 'darkred')),
+            sg.Button('CANCEL', size=(12,1), button_color=('white', var.colors['red'])),
         ],   
     ]
 
@@ -369,24 +437,29 @@ def settings_gui():
                 #print('SETTINGS WINDOW POSITION:', window_settings.CurrentLocation())
                 window_settings.close()
                 window.UnHide()
-                break
+                return False
+
             elif event == 'SAVE':
-                                
+                window_settings.close()
+                window.UnHide()
+                window.Refresh()
+
                 #! apply changes
                 for setting in values:
                     var.SETTINGS[setting] = values[setting]
 
                 if var.SETTINGS['remember_position']:
-                    var.SETTINGS['window_position'] = window.CurrentPosition()
+                    try:
+                        var.SETTINGS['window_position'] = window.CurrentLocation()
+                    except:
+                        var.SETTINGS['window_position'] = False
                 else:
                     var.SETTINGS['window_position'] = False
                 
                 var.saveSettings()
-                
-                window_settings.close()
-                window.UnHide()
+
                 updateStatus()
-                break
+                return True
 
 
 def settings_vpn():
@@ -413,7 +486,7 @@ def settings_vpn():
 
         [   
             sg.Button('SAVE', size=(12,1), button_color=('white', 'darkgreen')),
-            sg.Button('CANCEL', size=(12,1), button_color=('white', 'darkred')),
+            sg.Button('CANCEL', size=(12,1), button_color=('white', var.colors['red'])),
         ],   
     ]
 
@@ -469,12 +542,17 @@ def settings_vpn():
 
 
 
+
+
 #* ---------- MAIN GUI ----------------------------------------------------------------------------------------------------
 
 def mainwindow():
     global window
     global vpnSettings
     global vpnStatus
+
+    #sg.main()
+    sg.SetGlobalIcon(var.statusicon['grey'])
 
     if window:
         try:
@@ -488,27 +566,23 @@ def mainwindow():
 
     #! INIT-POPUP-SPLASH
     layout = [
-        [ sg.Image(filename=var.splash, expand_x=True)],
-        [ sg.Text(windowtitle, font=('Segoe UI', 14)) ],
-        [ sg.Text('[AN UNOFFICIAL ADD-ON]', font=('Segoe UI', 10)) ],
-        [ sg.Text() ],
+        [ sg.Image(filename=var.splash, expand_x=True, background_color=var.splashbgcolor)],
+        [ sg.Text(windowtitle, font=('Segoe UI', 14), text_color=var.splastextcolor, background_color=var.splashbgcolor) ],
+        [ sg.Text('[AN UNOFFICIAL ADD-ON]', font=('Segoe UI', 10), text_color=var.splastextcolor, background_color=var.splashbgcolor) ],
+        [ sg.Text(background_color=var.splashbgcolor) ],
     ]
 
-    #if not var.SETTINGS['window_position']:
-    #    window = sg.Window('Loading ...', layout, element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
-    #else:
-    window = sg.Window('Loading ...', layout, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
+    window = sg.Window('Loading ...', layout, location=getWindowPosition(), background_color=var.splashbgcolor, element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
 
     window.Refresh()
     vpnSettings = vpnControl.vpnLoadSettings()
+
+    checkAccountStatus()
+
     vpnStatus = vpnControl.vpnStatus()[1] # ignore text, only grab vars
     window.close()
     window = None
     
-    #! needs a nice window...
-    #if vpnSettings.get('infos'):
-    #    showInfo(wintitle="NordVPN Infos", wintext=vpnSettings.get('infos'))
-
     #print(vpnSettings)
 
     #! MAIN WINDOW
@@ -558,17 +632,28 @@ def mainwindow():
     menu_disabled_text_color = '#999999'
     menu_background_color = '#3d3d3d'
 
+    statusicon = [
+                    [ sg.Image(filename=var.statusicon['grey'], key='-statusicon-', expand_x=True)],
+                ]
+
+    mainbuttons = [
+                    [ sg.Button('LOADING...', font=('Segoe UI', 18), size=(10,1), key='-btnConnect-'), ],
+                    [ sg.Button('SELECT SERVER', size=(15,1), button_color=('white', var.colors['purple']), key='-btnSelectServer-' ), ],
+                ]
+
+    
+
     layout = [
                 [sg.Menu(menu_def, tearoff=False, pad=(200, 1), background_color = menu_background_color, text_color = menu_text_color, disabled_text_color = menu_disabled_text_color, key='Menu')],
                 #[ sg.Text( 'User: ' + vpnSettings['account']['Email Address'], font=('Segoe UI', 8) ) ],
                 #[ sg.Text( vpnSettings['account']['VPN Service'] , font=('Segoe UI', 8) ) ],
                 [ sg.Text('', font=('Segoe UI', 2) ) ],
-                [   
-                    sg.Button('Loading...', button_color=('grey', 'darkgrey'), font=('Segoe UI', 18), size=(19,1), key='-btnConnect-'),
-                ],
-                [   
-                    sg.Button('SELECT SERVER', size=(28,1), key='-btnSelectServer-'),
-                ],
+
+
+                [ sg.Column(statusicon, element_justification='c'), sg.Column(mainbuttons, element_justification='c')],
+
+                
+                
                 [ sg.Text('', font=('Segoe UI', 2) ) ],
                 [ sg.Frame(" STATUS ", layout_status, size=size_status, key='frameStatus' ), ],
                 [ sg.Frame(" QUICKSET ", layout_quickset, size=size_quickset, key='frameQuickset' ), ],
@@ -592,6 +677,10 @@ def mainwindow():
     #    window = sg.Window(windowtitle, layout, element_justification='center', alpha_channel = 1, keep_on_top=var.SETTINGS['keep_on_top'], right_click_menu=MENU_RIGHT_CLICK, finalize=True) #.centered
     #else:
     window = sg.Window('SimpleGUI for NordVPN', layout, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=var.SETTINGS['keep_on_top'], right_click_menu=MENU_RIGHT_CLICK, finalize=True) #.use var.window_positionfixed
+    
+    #! needs a nice window...?
+    if vpnSettings.get('infos'): print(vpnSettings.get('infos')[0])
+    
     window.Refresh()
 
     status_ts = updateStatus()
@@ -631,12 +720,14 @@ def mainwindow():
             elif event == '-btnConnect-':
                 # connect / disconnect vpn
                 if vpnStatus['Status'] == 'Connected':
-                    window['-btnConnect-'].update('DISCONNECTING...', button_color = ('white','darkgrey'))
+                    window['-btnConnect-'].update('LOADING...')
+                    window['-statusicon-'].update(filename=var.statusicon['grey'])
                     window.Refresh()
                     reply = vpnControl.vpnDisconnect()
                     sleep(5) # wait a bit to finish "network-recovery"
                 else:
-                    window['-btnConnect-'].update('CONNECTING...', button_color = ('white','darkgrey'))
+                    window['-btnConnect-'].update('LOADING...')
+                    window['-statusicon-'].update(filename=var.statusicon['grey'])
                     window.Refresh()
                     reply = vpnControl.vpnConnect()
                     #if "You are connected to" in reply[1]:
@@ -688,14 +779,18 @@ def mainwindow():
             # ---- MENU ITEMS -----
 
             elif event == 'GUI Settings': 
-                settings_gui()
-
+                restart = settings_gui()
+                if restart:
+                    window.Close()
+                    window = None
+                    os.execl(sys.executable, sys.executable, *sys.argv)
 
             elif event == 'VPN Settings': 
                 settings_vpn()
             
             elif event == 'Automatic':
-                window['-btnConnect-'].update('CONNECTING...', button_color = ('white','darkgrey'))
+                window['-btnConnect-'].update('LOADING...')
+                window['-statusicon-'].update(filename=var.statusicon['grey'])
                 window.Refresh()
                 reply = vpnControl.vpnConnect()
 
@@ -704,14 +799,18 @@ def mainwindow():
                 reply = select_server(event)
 
             elif event == 'Disconnect':
-                window['-btnConnect-'].update('DISCONNECTING...', button_color = ('white','darkgrey'))
+                window['-btnConnect-'].update('LOADING...')
+                window['-statusicon-'].update(filename=var.statusicon['grey'])
                 window.Refresh()
                 reply = vpnControl.vpnDisconnect()
-                sleep(5) # wait a bit to finish "network-recovery"
+                #sleep(5) # wait a bit to finish "network-recovery"
 
             elif event == 'Update Status':
                 #  updateStatus() ends after this
                 pass
+
+            elif event == "Login":
+                vpnControl.vpnLogin()
 
             elif event == 'Logout':
                 if getConfirmation('Logout?', ['Are you sure you want to log out?', 'This will end any vpn connection and close the app.']):
@@ -725,7 +824,6 @@ def mainwindow():
                     'Service: '+ vpnSettings['account']['VPN Service']
                 ]
                 showInfo(wintitle='NordVPN Account', wintext=infotext)
-
 
             elif event == 'About':
                 infotext = [
