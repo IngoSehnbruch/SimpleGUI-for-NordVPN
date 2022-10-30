@@ -13,7 +13,7 @@ minclientversion = "3.13.2"
 #* folders
 appfolder = os.path.dirname(sys.argv[0])
 logfolder = os.path.join(appfolder, 'logs')
-#datafolder = os.path.join(appfolder, 'data')
+datafolder = os.path.join(appfolder, 'data')
 
 mediafolder = os.path.join(appfolder, 'media')
 splash = os.path.join(mediafolder, 'logo_nordvpn.png')
@@ -23,7 +23,7 @@ statusicon = {
         'grey' : os.path.join(mediafolder, 'status_grey_100.png'),
     }
 
-settings_jsonfile = os.path.join(appfolder, 'settings.json')
+settings_jsonfile = os.path.join(datafolder, 'settings.json')
 
 defaultwindowposition = (50, 50)
 font = ('Segoe UI', 12)
@@ -32,13 +32,15 @@ font = ('Segoe UI', 12)
 
 SETTINGS = {
     'DEBUG' : True, # get a boolean value
-    'console' : True,
+    'use_terminal' : False,
     'log' : False,
     'keep_on_top' : True,
-    'remember_position' : False,
-    'window_position' : False, # e.g. (750, 220) or false
+    'remember_position' : True,
+    'window_position' : defaultwindowposition, # e.g. (750, 220) or false
     'lastconnection' : 'Automatic', # None = automatic
     'darkmode' : False,
+
+    'view_visibility' : { 'Status' : True, 'Quickset' : True, 'Log' : True, }
 }
 
 if os.path.exists(settings_jsonfile):
@@ -61,8 +63,12 @@ colors = {
     'orange' :      '#FF7E23',
     'purple' :      '#7F7AEE',
     'green' :       '#27BE56',
+
     'black' :       '#000000',
     'white' :       '#ffffff',
+    'grey' :        '#999999',
+    'dark_grey' :   '#333333',
+    'light_grey' :  '#dddddd',
 }
 
 if SETTINGS['darkmode']:
@@ -73,6 +79,10 @@ if SETTINGS['darkmode']:
     buttonbgcolors = (colors['white'], colors['blue'])
     connectbgcolor = colors['purple']
     textcolor = colors['white']
+
+    menu_text_color = colors['white']
+    menu_disabled_text_color = colors['grey']
+    menu_background_color = colors['dark_grey']
 else:
     splashbgcolor = colors['dark_blue']
     splastextcolor = colors['white']
@@ -82,8 +92,9 @@ else:
     connectbgcolor = colors['purple']
     textcolor = colors['dark_blue']
 
-
-
+    menu_text_color = colors['black']
+    menu_disabled_text_color = colors['grey']
+    menu_background_color = colors['light_grey']
 
 LINKS = {
     'gui' : { 
@@ -109,5 +120,3 @@ settingsDict = {
     'dns' :                     [ 'string', 'DNS', 'Set custom DNS servers. (Note: Setting DNS disables ThreatProtectionLite.)' ], # defaut: false
     'technology' :              [ 'select', 'Technology', 'Sets the technology', ['OpenVPN', 'NordLynx'] ],
 }
-    # defaults => Restores settings to their default values.
-

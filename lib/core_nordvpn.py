@@ -54,8 +54,11 @@ def vpnRegister():
 def vpnLoadAccount():
     return runCommand( [vpnapp, 'account'], ['Email Address', 'VPN Service'], lines_ignored=lines_ignored )[1]
 
+def vpnResetSettings():
+    return runCommand( [vpnapp, 'set', 'defaults'], lines_ignored=lines_ignored )
+
 def vpnLoadSettings():
-    jsonVpnFile = os.path.join( var.appfolder, 'options_nordvpn.json')
+    jsonVpnFile = os.path.join( var.datafolder, 'options_nordvpn.json')
 
     # GET NORD-VPN APP-VERSION (step by step - may not be installed!)
     vpnversion = "NOT INSTALLED"

@@ -1,40 +1,29 @@
 # This python script uses the following encoding: utf8
-import os
 import sys
 
 from lib import core_vars as var
-from lib import core_gui as gui
+from lib import core_functions as cf
+from lib import core as core
 
-#* ---------- PATHs
+#* ----- ----- INIT APP ----- ----- 
 
-def checkpath(pathname):
-    try:
-        if not os.path.isdir(pathname):
-            os.makedirs(pathname)
-            print('Path created: ' + pathname)
-        return True
-    except Exception as err:
-        print("ERROR: PATH CAN NOT BE CREATED")
-        print("PATH: " + pathname)
-        print(err)
-        return False
 
-#* ----- ----- MAIN START ----- ----- 
 
 if __name__ == '__main__':
 
-    if not checkpath(var.logfolder): quit()
+    if not cf.checkpath(var.logfolder): quit()
+    if not cf.checkpath(var.datafolder): quit()    
     
-    optionals = ['-terminal', '-log']
+    optionals = ['-terminal', '-log', '-reset']
     for arg in sys.argv[1:]:
-        if arg=="-terminal":    var.SETTINGS['console']     = False
-        elif arg=="-log":       var.SETTINGS['log'] = True
-        else: print("UNKNOWN ARGUMENT:", arg)
-
-    
+        if arg=="-terminal" :   var.SETTINGS['use_terminal'] = True
+        elif arg=="-log" :      var.SETTINGS['log'] = True
+        elif arg=="-reset" :    var.settings_reset()
+        else: 
+            print("UNKNOWN ARGUMENT:", arg)
+            quit()
 
     #* load GUI to continue
     end = False
     while not end:
-        end = gui.mainwindow()
-
+        end = core.startApp()

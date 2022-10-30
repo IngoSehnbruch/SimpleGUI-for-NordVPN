@@ -1,6 +1,7 @@
 # This python script uses the following encoding: utf8
 import subprocess
 import os
+import sys
 import socket
 import json
 
@@ -9,8 +10,24 @@ import json
 def localip():
     return [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1] # filter 127.0.0.1
 
+#* Check for PATHs
+def checkpath(pathname):
+    try:
+        if not os.path.isdir(pathname):
+            os.makedir(pathname)
+            print('Path created: ' + pathname)
+        return True
+    except Exception as err:
+        print("ERROR: PATH CAN NOT BE CREATED")
+        print("PATH: " + pathname)
+        print(err)
+        return False
 
-#run a consolecommand and return output as line (and optional generate a dict by given var-names)
+
+def restartApp():
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+# run a consolecommand and return output as line (and optional generate a dict by given var-names)
 def runCommand(cmd, varList=[], lines_ignored=[], donotskip = False):
     try:
         result = subprocess.run(cmd, stdout=subprocess.PIPE)
