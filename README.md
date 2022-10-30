@@ -1,4 +1,4 @@
-# A SimpleGUI for NordVPN
+# A SimpleGUI for NordVPN on LINUX
 
 NordVPN only provides a commandline tool to control the vpn on linux. 
 
