@@ -5,10 +5,9 @@ import json
 
 #* app defaults
 appversion = "0.1"
-icon = "nordvpngui.ico"
-separator = ";"
+minclientversion = "3.13.2" # first one tested
 
-minclientversion = "3.13.2"
+separator = ";"
 
 #* folders
 appfolder = os.path.dirname(sys.argv[0])
@@ -16,11 +15,12 @@ logfolder = os.path.join(appfolder, 'logs')
 datafolder = os.path.join(appfolder, 'data')
 
 mediafolder = os.path.join(appfolder, 'media')
-splash = os.path.join(mediafolder, 'logo_nordvpn.png')
+icon = os.path.join(mediafolder, 'nordvpngui.png')
+
 statusicon = {
-        'green' : os.path.join(mediafolder, 'status_green_100.png'),
-        'red' : os.path.join(mediafolder, 'status_red_100.png'),
-        'grey' : os.path.join(mediafolder, 'status_grey_100.png'),
+        'green' : os.path.join(mediafolder, 'status', 'connected.png'),
+        'red' : os.path.join(mediafolder, 'status', 'disconnected.png'),
+        'grey' : os.path.join(mediafolder, 'status', 'processing.png'),
     }
 
 settings_jsonfile = os.path.join(datafolder, 'settings.json')
@@ -29,18 +29,17 @@ defaultwindowposition = (50, 50)
 font = ('Segoe UI', 12)
 
 
-
 SETTINGS = {
-    'DEBUG' : True, # get a boolean value
+    'DEBUG' : False,
     'use_terminal' : False,
     'log' : False,
     'keep_on_top' : True,
     'remember_position' : True,
-    'window_position' : defaultwindowposition, # e.g. (750, 220) or false
-    'lastconnection' : 'Automatic', # None = automatic
+    'window_position' : defaultwindowposition, 
+    'lastconnection' : 'Automatic', 
     'darkmode' : False,
 
-    'view_visibility' : { 'Status' : True, 'Quickset' : True, 'Log' : True, }
+    'view_visibility' : { 'Status' : True, 'Quickset' : True, 'Log' : False, }
 }
 
 if os.path.exists(settings_jsonfile):
@@ -83,9 +82,14 @@ if SETTINGS['darkmode']:
     menu_text_color = colors['white']
     menu_disabled_text_color = colors['grey']
     menu_background_color = colors['dark_grey']
+
+    log_text_color = colors['white']
+    log_background_color = colors['black']
+
+    logo = os.path.join(mediafolder, 'logos', 'nordvpn_q_dark.png')
 else:
-    splashbgcolor = colors['dark_blue']
-    splastextcolor = colors['white']
+    splashbgcolor = colors['white']
+    splastextcolor = colors['dark_blue']
     
     windowbgcolor = colors['white']
     buttonbgcolors = (colors['white'], colors['blue'])
@@ -96,6 +100,11 @@ else:
     menu_disabled_text_color = colors['grey']
     menu_background_color = colors['light_grey']
 
+    log_text_color = colors['black']
+    log_background_color = colors['light_grey']
+
+    logo = os.path.join(mediafolder, 'logos', 'nordvpn_q_light.png')
+
 LINKS = {
     'gui' : { 
         'homepage'  : 'https://github.com/IngoSehnbruch/SimpleGUI-for-NordVPN',
@@ -104,7 +113,8 @@ LINKS = {
     'nordvpn' : { 
         'homepage'  : 'https://nordvpn.com/',
         'install'   : 'https://nordvpn.com/de/download/linux/',
-        'register'  : 'https://nordvpn.com/pricing/'
+        'register'  : 'https://nordvpn.com/pricing/',
+        'ip'        : 'https://nordvpn.com/what-is-my-ip/'
     },
 }
 
