@@ -130,7 +130,7 @@ def checkAccountStatus():
     account = vpnControl.vpnLoadAccount()
     while not account.get('Email Address'):
         # ask to login
-        todo = gui.getSingleChoice(wintitle="Please login to NordVPN", wintext="You are not logged in. Please login to your NordVPN Account.", valuelist=['Login at NordVPN Website', 'Register at NordVPN Website', 'Exit NordVPN-GUI'], selectfirst=True)
+        todo = gui.getSingleChoice(wintitle="Please login to NordVPN", wintext=["You are not logged in.", "Please login to your NordVPN Account."], valuelist=['Login at NordVPN Website', 'Register at NordVPN Website', 'Exit NordVPN-GUI'], selectfirst=True)
         if todo == 'Login at NordVPN Website':
             reply = vpnControl.vpnLogin()
             try:
@@ -164,9 +164,6 @@ def updateStatus():
     status = None
 
     #* GET VPN Status
-
-    
-
     try:
         vpnStatus = vpnControl.vpnStatus()[1] # ignore text, only grab vars
         status = vpnStatus['Status']
@@ -222,7 +219,7 @@ def select_server(selection=None, country=None):
         selections = [ var.SETTINGS['lastconnection'] ] + selections
 
     if selection == None:
-        selection = gui.getSingleChoice(wintitle="Select Server", wintext="Select from what list to choose:", valuelist=selections, selectfirst=True)
+        selection = gui.getSingleChoice(wintitle="Select Server", wintext=["Select from what list to choose"], valuelist=selections, selectfirst=True)
     
     if selection == var.SETTINGS['lastconnection']:
         setStatusToLoading()
@@ -233,19 +230,19 @@ def select_server(selection=None, country=None):
         reply = vpnControl.vpnConnect('Automatic')
 
     if selection == 'by Country' or (selection == 'by City' and country==None):
-        country = gui.getSingleChoice_Dropdown(wintitle="Select Server", wintext="Select the country:", valuelist=vpnSettings['countries'], selectfirst=False)
+        country = gui.getSingleChoice_Dropdown(wintitle="Select Server", wintext=["Select the country"], valuelist=vpnSettings['countries'], selectfirst=False)
         if selection == 'by Country' and country: 
             setStatusToLoading()
             reply = vpnControl.vpnConnect(country)
         
     if selection == 'by City' and country:
-        city = country = gui.getSingleChoice_Dropdown(wintitle="Select Server", wintext="Select the city:", valuelist=vpnSettings['citydict'][country], selectfirst=False)
+        city = country = gui.getSingleChoice_Dropdown(wintitle="Select Server", wintext=["Select the city:"], valuelist=vpnSettings['citydict'][country], selectfirst=False)
         if city: 
             setStatusToLoading()
             reply = vpnControl.vpnConnect(city)
     
     if selection == 'by Type':
-        servertype = country = gui.getSingleChoice_Dropdown(wintitle="Select Server", wintext="Select the servertype:", valuelist=vpnSettings['vpngroups'], selectfirst=False)
+        servertype = country = gui.getSingleChoice_Dropdown(wintitle="Select Server", wintext=["Select the servertype:"], valuelist=vpnSettings['vpngroups'], selectfirst=False)
         if servertype: 
             setStatusToLoading()
             reply = vpnControl.vpnConnect(servertype)
@@ -340,9 +337,6 @@ def settings_vpn():
                     [ sg.Checkbox(var.settingsDict[setvar][1], default = setval, key="checkbox-"+setvar, enable_events=True, tooltip=var.settingsDict[setvar][2]), ],            
                 ])
 
-
-    #vpnSettings['settings']['DNS']
-
     layout_set_dns = [
         [ sg.Button('SET DNS', size=(12,1), ), sg.Text( vpnSettings['settings']['DNS'], key='SET_DNS' ), ],
     ]
@@ -354,24 +348,14 @@ def settings_vpn():
 
     layout_settings = [
         [ sg.Frame(" VPN ", layout_cb_vpn, size=(300, 230)), ],
-        
-        
-
         [ sg.Frame(" DNS ", layout_set_dns, size=(300, 65)), ],
-
         [ sg.Frame(" TECHNOLOGY ", layout_set_technology, size=(300, 65)), ],
-
         [ sg.Text('', font=('Segoe UI', 2) ) ],
-
         [   
             sg.Button('SAVE', size=(10,1), button_color=('white', 'darkgreen')),
             sg.Button('CANCEL', size=(10,1), button_color=('white', var.colors['red'])),
         ],   
     ]
-
-
-
-
 
     window_settings = sg.Window(settingswindowtitle, layout_settings, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
     window_settings.BringToFront()
@@ -603,14 +587,11 @@ def startApp():
     global vpnSettings
     global vpnStatus
 
+    # init app
     splashwindow()
-
     mainwindow()
     updateViewVisibiliy()
-
     status_ts = updateStatus()
-
-    print(vpnSettings['settings'])
 
     # Main Window Event Loop
     # Wait for Command

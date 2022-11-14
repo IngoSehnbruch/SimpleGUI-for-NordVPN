@@ -8,6 +8,9 @@ The GUI lets you control (most of) the actions and settings of the commandline
 tool and gives you a visual status of your connection.
 
 
+![Screenshots](media/screenshots.jpg)
+
+
 # *** Working alpha Version ***
 
 You are very much invited to contribute on every level...
