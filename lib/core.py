@@ -21,7 +21,7 @@ vpnStatus = None
 
 #* ---------- GUI STYLE ----------
 
-# sg.theme('DarkBlue1')  # please make your windows colorful : ) #DarkGrey14
+# sg.theme('DarkBlue1')  
 
 sg.set_options(
         #icon                            = var.icon, 
@@ -43,6 +43,7 @@ sg.set_options(
     )
 
 sg.SetGlobalIcon( var.icon )
+
 
 #* ---------- WINDOW STUFF ----------
 
@@ -164,6 +165,8 @@ def updateStatus():
 
     #* GET VPN Status
 
+    
+
     try:
         vpnStatus = vpnControl.vpnStatus()[1] # ignore text, only grab vars
         status = vpnStatus['Status']
@@ -188,6 +191,9 @@ def updateStatus():
             
             window['-btnConnect-'].update('DISCONNECT')
             window['-statusicon-'].update(filename=var.statusicon['green'])
+
+            #window.iconbitmap(var.statusicon['green'])
+            window.set_icon( var.statusicon['green'] )
         else:
             # UPDATE WINDOW
             window['-status-Uptime-'].update('NOT CONNECTED')
@@ -196,7 +202,9 @@ def updateStatus():
             
             window['-btnConnect-'].update('CONNECT')
             window['-statusicon-'].update(filename=var.statusicon['red'])
-            
+            #window.iconbitmap(var.statusicon['red'])
+            window.set_icon( var.statusicon['red'] )
+
         window.Refresh()
     except Exception as err:
         log("Status-Update Error", str(err))
@@ -332,16 +340,38 @@ def settings_vpn():
                     [ sg.Checkbox(var.settingsDict[setvar][1], default = setval, key="checkbox-"+setvar, enable_events=True, tooltip=var.settingsDict[setvar][2]), ],            
                 ])
 
+
+    #vpnSettings['settings']['DNS']
+
+    layout_set_dns = [
+        [ sg.Button('SET DNS', size=(12,1), ), sg.Text( vpnSettings['settings']['DNS'], key='SET_DNS' ), ],
+    ]
+
+    layout_set_technology = [
+        [ sg.Button('SET TECH', size=(12,1), ), sg.Text(vpnSettings['settings']['Technology'], key='SET_TECHNOLOGY' ), ],
+    ]
+
+
     layout_settings = [
-        [ sg.Frame(" VPN ", layout_cb_vpn, size=(300, 250)), ],
+        [ sg.Frame(" VPN ", layout_cb_vpn, size=(300, 230)), ],
         
+        
+
+        [ sg.Frame(" DNS ", layout_set_dns, size=(300, 65)), ],
+
+        [ sg.Frame(" TECHNOLOGY ", layout_set_technology, size=(300, 65)), ],
+
         [ sg.Text('', font=('Segoe UI', 2) ) ],
 
         [   
-            sg.Button('SAVE', size=(12,1), button_color=('white', 'darkgreen')),
-            sg.Button('CANCEL', size=(12,1), button_color=('white', var.colors['red'])),
+            sg.Button('SAVE', size=(10,1), button_color=('white', 'darkgreen')),
+            sg.Button('CANCEL', size=(10,1), button_color=('white', var.colors['red'])),
         ],   
     ]
+
+
+
+
 
     window_settings = sg.Window(settingswindowtitle, layout_settings, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=True, finalize=True) #.centered
     window_settings.BringToFront()
@@ -355,6 +385,26 @@ def settings_vpn():
                 window_settings.close()
                 window.UnHide()
                 break
+
+            elif event == 'SET DNS':
+                newdns = gui.getValue(wintitle="DNS SERVERS", wintext=["SET DNS SERVERS:", "A list of max 3 IP addresses separated by space.", "Leave empty to disable. Example:", "0.0.0.0 1.2.3.4"], defaulttext=vpnSettings['settings']['DNS'])
+                if newdns == "": newdns = "disabled"
+                if newdns and newdns != vpnSettings['settings']['DNS']:
+                    reply = vpnControl.vpnSet('dns', newdns)[0]
+                    log(reply[0])
+                    vpnSettings = vpnControl.vpnLoadSettings()
+                    window_settings['SET_DNS'].update(vpnSettings['settings']['DNS'])
+                    gui.showInfo("DNS", reply, )
+
+            elif event == 'SET TECH':
+                newtech = gui.getSingleChoice(wintitle="Please choose VPN Technology", wintext=["Supported values for [technology]:", "OpenVPN or NordLynx"] , valuelist= ['OpenVPN', 'NordLynx', ], selectfirst=False)
+                if newtech and newtech != vpnSettings['settings']['Technology']:
+                    reply = vpnControl.vpnSet('technology', newtech)[0]
+                    log(reply[0])
+                    vpnSettings = vpnControl.vpnLoadSettings()
+                    window_settings['SET_TECHNOLOGY'].update(vpnSettings['settings']['Technology'])
+                    gui.showInfo("Technology", reply, )
+
             elif event == 'SAVE':
                 # apply changes
                 changes = 0
@@ -560,6 +610,8 @@ def startApp():
 
     status_ts = updateStatus()
 
+    print(vpnSettings['settings'])
+
     # Main Window Event Loop
     # Wait for Command
     # Update Status every 60 seconds
@@ -580,7 +632,7 @@ def startApp():
         # HANDLE USER-INPUT EVENTS
 
         event, values = window.read(timeout=0)
-
+    
         if event != '__TIMEOUT__':
             reply = None
 
@@ -606,12 +658,14 @@ def startApp():
                 if vpnStatus['Status'] == 'Connected':
                     window['-btnConnect-'].update('LOADING...')
                     window['-statusicon-'].update(filename=var.statusicon['grey'])
+                    window.set_icon( var.statusicon['grey'] )
                     window.Refresh()
                     reply = vpnControl.vpnDisconnect()
                     sleep(5) # wait a bit to finish "network-recovery"
                 else:
                     window['-btnConnect-'].update('LOADING...')
                     window['-statusicon-'].update(filename=var.statusicon['grey'])
+                    window.set_icon( var.statusicon['grey'] )
                     window.Refresh()
                     reply = vpnControl.vpnConnect()
 
@@ -709,6 +763,7 @@ def startApp():
             elif event == 'Automatic':
                 window['-btnConnect-'].update('LOADING...')
                 window['-statusicon-'].update(filename=var.statusicon['grey'])
+                window.set_icon( var.statusicon['grey'] )
                 window.Refresh()
                 reply = vpnControl.vpnConnect()
 
@@ -719,6 +774,7 @@ def startApp():
             elif event == 'Disconnect':
                 window['-btnConnect-'].update('LOADING...')
                 window['-statusicon-'].update(filename=var.statusicon['grey'])
+                window.set_icon( var.statusicon['grey'] )
                 window.Refresh()
                 reply = vpnControl.vpnDisconnect()
                 sleep(5) # wait a bit to finish "network-recovery"

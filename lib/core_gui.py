@@ -69,8 +69,11 @@ def getMultipleChoice(wintitle="Please choose", wintext="Min 1 choice:", valueli
     else:
         return False
 
-def getSingleChoice(wintitle="Please choose", wintext="1 choice:", valuelist= ['none',], selectfirst=False):
-    layout = [[sg.Text(wintext)],]
+def getSingleChoice(wintitle="Please choose", wintext=["1 choice:"], valuelist= ['none',], selectfirst=False):
+    layout = [] 
+    for text in wintext:
+        layout.append([sg.Text(text)])
+
     layout.append([sg.Text('')])
     i=0
     for vitem in valuelist:
@@ -109,8 +112,10 @@ def getSingleChoice(wintitle="Please choose", wintext="1 choice:", valuelist= ['
 
 
 
-def getSingleChoice_Dropdown(wintitle="Please choose", wintext="1 choice:", valuelist= ['none',], selectfirst=False):
-    layout = [[sg.Text(wintext + ':')],]
+def getSingleChoice_Dropdown(wintitle="Please choose", wintext=["1 choice:",], valuelist= ['none',], selectfirst=False):
+    layout = [] 
+    for text in wintext:
+        layout.append([sg.Text(text)])
     
     layout.append([ sg.InputCombo(( valuelist ), font=('Courier New', 12), key='-choice-'),                ])
 
@@ -154,11 +159,18 @@ def getFile(wintitle="File", wintext="Choose a file", filetypes=("all", "*.*")):
         return False
 
 def getValue(wintitle="Value", wintext="Please ender value", defaulttext=''):
-    layout = [[sg.Text(wintext + ':')],
+    
+
+    layout = [] 
+    for text in wintext:
+        layout.append([sg.Text(text)])
+
+    layout.append([
                 [sg.Input(size=(40,1), default_text = defaulttext)],
                 [sg.Text('')],
-                [sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))] ]
-    
+                [sg.OK(button_text='OK', button_color=('white', var.colors['green']), size=(22, 1)), sg.Cancel(button_text='CANCEL', button_color=('white', var.colors['red']), size=(23, 1))] 
+        ])
+
     valuewindow = sg.Window(wintitle, layout, location=var.SETTINGS['window_position'], element_justification='center', keep_on_top=True, finalize=True)
     valuewindow.BringToFront()
     event, values = valuewindow.read()
@@ -169,7 +181,7 @@ def getValue(wintitle="Value", wintext="Please ender value", defaulttext=''):
         if values[0]:
             return values[0]
         else:
-            showInfo('Info', ["No Value entered"])
-            return False
+            #showInfo('Info', ["No Value entered"])
+            return "" #False
     else:
         return False
