@@ -2,13 +2,8 @@
 import subprocess
 import os
 import sys
-import socket
 import json
 
-
-#* get (current) local ip
-def localip():
-    return [ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")][:1] # filter 127.0.0.1
 
 #* Check for PATHs
 def checkpath(pathname):
@@ -23,9 +18,6 @@ def checkpath(pathname):
         print(err)
         return False
 
-
-def restartApp():
-    os.execl(sys.executable, sys.executable, *sys.argv)
 
 # run a consolecommand and return output as line (and optional generate a dict by given var-names)
 def runCommand(cmd, varList=[], lines_ignored=[], donotskip = False):
@@ -58,6 +50,10 @@ def runCommand(cmd, varList=[], lines_ignored=[], donotskip = False):
     else:
         return textlines
 
+
+# "hard" restart
+def restartApp():
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 # load a json-textfile as a dict

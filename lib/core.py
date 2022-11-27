@@ -172,14 +172,20 @@ def updateStatus():
 
     try:
         if status == "Connected":
-            # Beautify utime-info
+            # remove seconds from uptime-info
             if "second" in vpnStatus['Uptime'].split(' ')[1]:
                 vpnStatus['Uptime'] = "Leass than a minute."
             else:
                 if 'minutes' in vpnStatus['Uptime']:
-                    vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minutes')[0] + "mins"
+                    vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minutes')[0] + "minutes"
                 elif 'minute' in vpnStatus['Uptime']:
-                    vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minute')[0] + "min"        
+                    vpnStatus['Uptime'] = vpnStatus['Uptime'].split('minute')[0] + "minute"
+            
+            # shorten uptime-info (to fit window)
+            try:
+                vpnStatus['Uptime'] = ' '.join(vpnStatus['Uptime'].split(' ')[:4])
+            except:
+                pass 
             
             # UPDATE WINDOW
             window['-status-Uptime-'].update(vpnStatus['Uptime'])
@@ -526,7 +532,7 @@ def mainwindow():
                     'Cancel',
                     ]]  
     
-    # ------ Layout Elements ------ #
+    # ------ Layout Elements ------ # 
 
     statusicon = [
                     [ sg.Image(filename=var.statusicon['grey'], key='-statusicon-', expand_x=True)],
@@ -542,6 +548,7 @@ def mainwindow():
                         [ sg.Text('Country:', size=(10,1) ), sg.Text('---', key='-status-Country-' ) ],
                         [ sg.Text('Server IP:', size=(10,1) ), sg.Text('---', key='-status-Server IP-' ) ],
                     ]
+
     size_status = (300,115)
 
     layout_quickset = [
@@ -573,12 +580,12 @@ def mainwindow():
        
     window = sg.Window(windowtitle, layout, location=getWindowPosition(), element_justification='center', alpha_channel = 1, keep_on_top=var.SETTINGS['keep_on_top'], right_click_menu=MENU_RIGHT_CLICK, finalize=True) #.use var.window_positionfixed
     
-    #! needs a nice window...?
+    # debug: show all infos from terminalapp
     if var.SETTINGS['DEBUG'] and vpnSettings.get('infos'): 
         for i in vpnSettings.get('infos'):
             log(i)
     
-    updateViewVisibiliy()
+    updateViewVisibiliy() # apply userpreferences to view
     
 
 
@@ -610,7 +617,7 @@ def startApp():
                 var.saveSettings()
 
 
-        # HANDLE USER-INPUT EVENTS
+        # -------------------- HANDLE USER-INPUT EVENTS ------------------------------
 
         event, values = window.read(timeout=0)
     
@@ -654,8 +661,9 @@ def startApp():
                 select_server()
 
             elif '-quick-' in event:
-
+                # quicksetting-checkboxes
                 if event == '-quick-keep on top-':
+                    # QUICKSET UI Setting
                     if values['-quick-keep on top-']:
                         window.keep_on_top_set()
                     else:
@@ -667,27 +675,27 @@ def startApp():
                         setvarto = 'enabled'
                     else:
                         setvarto = 'disabled'
-
+                    # run command to apply change
                     reply = vpnControl.vpnSet(setvar, setvarto)[0]
 
             elif event == "Show All":
+                # Set all window elelemts to visible
                 for v, vsetting in var.SETTINGS['view_visibility'].items():
                     var.SETTINGS['view_visibility'][v] = True
                 var.saveSettings()
                 updateViewVisibiliy()
             
             elif event == "Hide All":
+                # Set all optional window elelemts to invisible
                 for v, vsetting in var.SETTINGS['view_visibility'].items():
                     var.SETTINGS['view_visibility'][v] = False
                 var.saveSettings()
                 updateViewVisibiliy()
 
             elif 'Toggle ' in event:
-                
+                # Toggle visibility of single window elements
                 view = event.replace('Toggle ', '')
-                if view == 'Menu':
-                    window['Menu'].hide_row() #! NOT WORKING....
-                elif view == 'Colormode':
+                if view == 'Colormode':
                     if var.SETTINGS['darkmode']:
                         var.SETTINGS['darkmode'] = False
                     else:
@@ -784,6 +792,7 @@ def startApp():
                 webbrowser.open(url, new=2)
 
             elif event == 'About':
+                # todo: read from file
                 infotext = [
                         '[inofficial] SimpleGUI for NordVPN - Version ' + var.appversion,
                         'Installed terminal app: ' + vpnSettings['vpnversion'],
@@ -798,6 +807,7 @@ def startApp():
                 gui.showInfo(wintitle=event, wintext=infotext)
                 
             elif event == 'Help':
+                # todo: read from file
                 infotext = [
                         'This GUI is an inofficial frontend for the nordvpn terminal application.',
                         'You can download the terminal app at ' + var.LINKS['nordvpn']['install'],
