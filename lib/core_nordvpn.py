@@ -97,7 +97,13 @@ def vpnLoadSettings():
         countries = []
         for line in runCommand([vpnapp, 'countries'], lines_ignored=lines_ignored):
             for section in line.split('\t'):
-                if len(section)>1: countries.append(section)
+
+                # example line: Country Name 1       Country Name 2
+                # split by more than one space and remove empty sections of variable length
+                for sec in section.split('  '):
+                    if len(sec)>1: countries.append(sec.strip())
+        
+        # REORDER
         countries.sort()
 
         # GET CITIES FOR EACH COUNTRY
@@ -107,6 +113,7 @@ def vpnLoadSettings():
             for line in runCommand([vpnapp, 'cities', country], lines_ignored=lines_ignored):
                 for section in line.split('\t'):
                     if len(section)>1: citylist.append(section)
+
             
             citylist.sort()
             citydict[country] = citylist

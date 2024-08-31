@@ -16,6 +16,7 @@ tool and gives you a visual status of your connection.
 You are very much invited to contribute on every level...
 Also, feel free to use the code in any way you want.
 
+Last updated: August 2024
 
 # Status Icon
 
@@ -85,3 +86,8 @@ but you can turn it on under GUI Settings
 
 Download at: https://nordvpn.com/download/
 (Tested with Version 3.13.2 and above)
+
+# TKINTER 
+If you do not have tkinter yet: sudo apt-get install python3-tk
+
+We are using PySimpleGUI==4.60.5.0 for now - but since PySimpleGUI went the commercial route, we will swap it out in one of the next updates.

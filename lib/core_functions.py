@@ -9,7 +9,8 @@ import json
 def checkpath(pathname):
     try:
         if not os.path.isdir(pathname):
-            os.makedir(pathname)
+            # os.makedir(pathname)
+            os.makedirs(pathname)
             print('Path created: ' + pathname)
         return True
     except Exception as err:

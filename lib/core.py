@@ -190,7 +190,7 @@ def updateStatus():
             # UPDATE WINDOW
             window['-status-Uptime-'].update(vpnStatus['Uptime'])
             window['-status-Country-'].update(vpnStatus['Country'])
-            window['-status-Server IP-'].update(vpnStatus['Server IP'])
+            #! window['-status-Server IP-'].update(vpnStatus['Server IP'])
             
             window['-btnConnect-'].update('DISCONNECT')
             window['-statusicon-'].update(filename=var.statusicon['green'])
@@ -201,7 +201,7 @@ def updateStatus():
             # UPDATE WINDOW
             window['-status-Uptime-'].update('NOT CONNECTED')
             window['-status-Country-'].update('NOT CONNECTED')
-            window['-status-Server IP-'].update('NOT CONNECTED')
+            window['-status-Server IP-'].update('NOT AVAILABLE')
             
             window['-btnConnect-'].update('CONNECT')
             window['-statusicon-'].update(filename=var.statusicon['red'])
